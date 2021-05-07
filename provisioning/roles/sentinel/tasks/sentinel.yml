@@ -1,0 +1,37 @@
+---
+- name: "Add Redis repo"
+  apt_repository:
+    repo: ppa:chris-lea/redis-server
+    state: present
+
+- name: "Install packages"
+  package:
+    state: present
+    name:
+      - "redis-sentinel"
+
+- name: "Create Sentinel PID folder"
+  file: 
+    path: "/var/run/sentinel"
+    state: "directory"
+    owner: "redis"
+    group: "redis"
+
+- name: "Enable and start Sentinel service"
+  systemd:
+    name: redis-sentinel
+    state: started
+    enabled: true
+
+- name: "Copy the Sentinel configuration file"
+  template:
+    src: sentinel.conf.j2
+    dest: /etc/redis/sentinel.conf
+  notify: "Restart Sentinel Service"
+
+- name: "Setup firewall"
+  ufw:
+    rule: allow
+    proto: tcp
+    port: '{{ sentinel.port }}'
+    comment: Sentinel incoming traffic

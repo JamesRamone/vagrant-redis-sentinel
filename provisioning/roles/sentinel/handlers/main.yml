@@ -1,0 +1,6 @@
+---
+- name: Restart Sentinel Service
+  systemd:
+    name: redis-sentinel
+    state: restarted
+    daemon-reload: yes

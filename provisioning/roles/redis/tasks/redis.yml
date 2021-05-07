@@ -1,0 +1,37 @@
+---
+- name: "Add Redis repo"
+  apt_repository:
+    repo: ppa:chris-lea/redis-server
+    state: present
+
+- name: "Install packages"
+  package:
+    state: present
+    name:
+      - "redis-server"
+
+- name: "Create Redis PID folder"
+  file: 
+    path: "/var/run/redis"
+    state: "directory"
+    owner: "redis"
+    group: "redis"
+
+- name: "Enable and start Redis service"
+  systemd:
+    name: redis-server
+    state: started
+    enabled: true
+
+- name: "Copy the redis configuration file"
+  template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+  notify: "Restart Redis Server"
+
+- name: "Setup firewall"
+  ufw:
+    rule: allow
+    proto: tcp
+    port: '{{ redis.port }}'
+    comment: Redis incoming traffic

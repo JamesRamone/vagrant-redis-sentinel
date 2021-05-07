@@ -1,0 +1,11 @@
+ansible_python_interpreter: /usr/bin/python3
+
+redis:
+  port: "6379"
+  protected: "yes"
+  bind: "{{ connection_host }} 127.0.0.1"
+  master: "node1"
+
+sentinel:
+  bind: "{{ connection_host }} 127.0.0.1"
+  port: "26379"
